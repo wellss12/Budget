@@ -15,7 +15,7 @@ public class BudgetService
     public decimal Query(DateTime startTime, DateTime endTime)
     {
         var budgets = _budgetRepo.GetAll();
-        if (!budgets.Any())
+        if (budgets is null || !budgets.Any())
         {
             return 0;
         }
@@ -29,22 +29,22 @@ public class BudgetService
         }
 
         return startBudget.Amount + endBudget.Amount;
+    }
 
-        decimal GetBudgetInMonth(DateTime startTime1, DateTime endTime1, Budget budget)
+    private decimal GetBudgetInMonth(DateTime startTime1, DateTime endTime1, Budget budget)
+    {
+        if (IsFullMonth(startTime1, endTime1))
         {
-            if (IsFullMonth(startTime1, endTime1))
-            {
-                return budget.Amount;
-            }
-
-            var days = (endTime1 - startTime1).Days;
-            days++;
-
-            var _ = DateTime.TryParse(budget.YearMonth, out var dateTime);
-            var daysInMonth = DateTime.DaysInMonth(dateTime.Year, dateTime.Month);
-
-            return budget.Amount / daysInMonth * days;
+            return budget.Amount;
         }
+
+        var days = (endTime1 - startTime1).Days;
+        days++;
+
+        var _ = DateTime.TryParse(budget.YearMonth, out var dateTime);
+        var daysInMonth = DateTime.DaysInMonth(dateTime.Year, dateTime.Month);
+
+        return budget.Amount / daysInMonth * days;
     }
 
     private static bool IsFullMonth(DateTime startTime, DateTime endTime)
