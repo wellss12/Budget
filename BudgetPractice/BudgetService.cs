@@ -19,6 +19,12 @@ public class DateTimeRange
     {
         return _startTime.ToString("yyyyMM") == _endTime.ToString("yyyyMM");
     }
+
+    public bool IsFullMonth()
+    {
+        return _startTime == new DateTime(_startTime.Year, _startTime.Month, 1)
+               && _endTime == new DateTime(_endTime.Year, _endTime.Month, 1).AddMonths(1).AddDays(-1);
+    }
 }
 
 public class BudgetService
@@ -43,7 +49,7 @@ public class BudgetService
         _dateTimeRange = new DateTimeRange(startTime, endTime);
         if (_dateTimeRange.IsSameMonth())
         {
-            if (IsFullMonth(startTime, endTime))
+            if (_dateTimeRange.IsFullMonth())
             {
                 return startBudget.Amount;
             }
@@ -118,11 +124,5 @@ public class BudgetService
     private static Budget? GetBudget(DateTime time, IEnumerable<Budget> budgets)
     {
         return budgets.FirstOrDefault(t => t.YearMonth == time.ToString("yyyyMM"));
-    }
-
-    private bool IsFullMonth(DateTime startTime, DateTime endTime)
-    {
-        return startTime == new DateTime(startTime.Year, startTime.Month, 1)
-               && endTime == new DateTime(endTime.Year, endTime.Month, 1).AddMonths(1).AddDays(-1);
     }
 }
