@@ -22,7 +22,6 @@ public class BudgetService
         }
 
         var startBudget = GetBudget(startTime, budgets);
-        var endBudget = GetBudget(endTime, budgets);
 
         if (IsSameMonth(startTime, endTime))
         {
@@ -43,9 +42,9 @@ public class BudgetService
         }
         else
         {
-            
-            var firstMonthAmount = GetFirstMonthAmount(startTime, startBudget);
-            var lastMonthAmount = GetLastMonthAmount(endTime, endBudget);
+            var endBudget = GetBudget(endTime, budgets);
+            var firstMonthAmount = GetFirstMonthAmount(startTime, startBudget.Amount);
+            var lastMonthAmount = GetLastMonthAmount(endTime, endBudget.Amount);
             var middleMonthsAmount = GetMiddleMonthsAmount(startTime, endTime, budgets);
 
             return firstMonthAmount + middleMonthsAmount + lastMonthAmount;
@@ -66,17 +65,17 @@ public class BudgetService
         return middleAmount;
     }
 
-    private static int GetLastMonthAmount(DateTime endTime, Budget? endBudget)
+    private static int GetLastMonthAmount(DateTime endTime, int totalAmount)
     {
         var endTimeDaysInMonth = GetDaysInMonth(endTime);
-        var amountForOneDayInLastMonth = GetAmountForOneDay(endBudget.Amount, endTimeDaysInMonth);
+        var amountForOneDayInLastMonth = GetAmountForOneDay(totalAmount, endTimeDaysInMonth);
         return amountForOneDayInLastMonth * endTime.Day;
     }
 
-    private static int GetFirstMonthAmount(DateTime startTime, Budget? startBudget)
+    private static int GetFirstMonthAmount(DateTime startTime, int totalAmount)
     {
         var startTimeDaysInMonth = GetDaysInMonth(startTime);
-        var amountForOneDayInFirstMonth = GetAmountForOneDay(startBudget.Amount, startTimeDaysInMonth);
+        var amountForOneDayInFirstMonth = GetAmountForOneDay(totalAmount, startTimeDaysInMonth);
         return amountForOneDayInFirstMonth * (startTimeDaysInMonth - startTime.Day + 1);
     }
 
