@@ -43,27 +43,41 @@ public class BudgetService
         }
         else
         {
-            var startTimeDaysInMonth = GetDaysInMonth(startTime);
-            var endTimeDaysInMonth = GetDaysInMonth(endTime);
             
-            var amountForOneDayInFirstMonth = GetAmountForOneDay(startBudget.Amount, startTimeDaysInMonth);
-            var amountForOneDayInLastMonth = GetAmountForOneDay(endBudget.Amount, endTimeDaysInMonth);
+            var firstMonthAmount = GetFirstMonthAmount(startTime, startBudget);
+            var lastMonthAmount = GetLastMonthAmount(endTime, endBudget);
+            var middleMonthsAmount = GetMiddleMonthsAmount(startTime, endTime, budgets);
 
-            var firstMonthTotalDays = startTimeDaysInMonth - startTime.Day + 1;
-            var firstMonthAmount = amountForOneDayInFirstMonth * firstMonthTotalDays;
-            var lastMonthAmount = amountForOneDayInLastMonth * endTime.Day;
-
-            var nextMonth = new DateTime(startTime.Year, startTime.AddMonths(1).Month, 1);
-            var middleAmount = 0;
-            while (nextMonth < new DateTime(endTime.Year, endTime.Month, 1))
-            {
-                var currentBudget = budgets.First(budget => budget.YearMonth == nextMonth.ToString("yyyyMM"));
-                middleAmount += currentBudget.Amount;
-                nextMonth = nextMonth.AddMonths(1);
-            }
-            
-            return firstMonthAmount + lastMonthAmount + middleAmount;
+            return firstMonthAmount + middleMonthsAmount + lastMonthAmount;
         }
+    }
+
+    private static int GetMiddleMonthsAmount(DateTime startTime, DateTime endTime, List<Budget> budgets)
+    {
+        var nextMonth = new DateTime(startTime.Year, startTime.AddMonths(1).Month, 1);
+        var middleAmount = 0;
+        while (nextMonth < new DateTime(endTime.Year, endTime.Month, 1))
+        {
+            var currentBudget = budgets.First(budget => budget.YearMonth == nextMonth.ToString("yyyyMM"));
+            middleAmount += currentBudget.Amount;
+            nextMonth = nextMonth.AddMonths(1);
+        }
+
+        return middleAmount;
+    }
+
+    private static int GetLastMonthAmount(DateTime endTime, Budget? endBudget)
+    {
+        var endTimeDaysInMonth = GetDaysInMonth(endTime);
+        var amountForOneDayInLastMonth = GetAmountForOneDay(endBudget.Amount, endTimeDaysInMonth);
+        return amountForOneDayInLastMonth * endTime.Day;
+    }
+
+    private static int GetFirstMonthAmount(DateTime startTime, Budget? startBudget)
+    {
+        var startTimeDaysInMonth = GetDaysInMonth(startTime);
+        var amountForOneDayInFirstMonth = GetAmountForOneDay(startBudget.Amount, startTimeDaysInMonth);
+        return amountForOneDayInFirstMonth * (startTimeDaysInMonth - startTime.Day + 1);
     }
 
     private static int GetAmountForOneDay(int amount, int daysInMonth)
