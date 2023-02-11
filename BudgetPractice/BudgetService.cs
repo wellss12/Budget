@@ -36,13 +36,19 @@ public class BudgetService
         }
         else
         {
-            var endBudget = GetBudget(endTime, budgets);
-            var firstMonthAmount = GetFirstMonthAmount(startTime, startBudget.Amount);
-            var lastMonthAmount = GetLastMonthAmount(endTime, endBudget.Amount);
-            var middleMonthsAmount = GetMiddleMonthsAmount(startTime, endTime, budgets);
-
-            return firstMonthAmount + middleMonthsAmount + lastMonthAmount;
+            return GetAmountForDifferentMonthRange(startTime, endTime, budgets);
         }
+    }
+
+    private static decimal GetAmountForDifferentMonthRange(DateTime startTime, DateTime endTime, List<Budget> budgets)
+    {
+        var startBudget = GetBudget(startTime, budgets);
+        var endBudget = GetBudget(endTime, budgets);
+        var firstMonthAmount = GetFirstMonthAmount(startTime, startBudget.Amount);
+        var lastMonthAmount = GetLastMonthAmount(endTime, endBudget.Amount);
+        var middleMonthsAmount = GetMiddleMonthsAmount(startTime, endTime, budgets);
+
+        return firstMonthAmount + middleMonthsAmount + lastMonthAmount;
     }
 
     private static decimal GetAmountForSameMonthRange(DateTime startTime, DateTime endTime, Budget? startBudget)
