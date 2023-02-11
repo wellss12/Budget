@@ -42,10 +42,11 @@ public class BudgetService
 
     private static decimal GetAmountForDifferentMonthRange(DateTime startTime, DateTime endTime, List<Budget> budgets)
     {
-        var startBudget = GetBudget(startTime, budgets);
-        var endBudget = GetBudget(endTime, budgets);
-        var firstMonthAmount = GetFirstMonthAmount(startTime, startBudget.Amount);
-        var lastMonthAmount = GetLastMonthAmount(endTime, endBudget.Amount);
+        var firstMonthTotalAmount = GetBudget(startTime, budgets)?.Amount ?? 0;
+        var secondMonthTotalAmount = GetBudget(endTime, budgets)?.Amount ?? 0;
+        
+        var firstMonthAmount = GetFirstMonthAmount(startTime, firstMonthTotalAmount);
+        var lastMonthAmount = GetLastMonthAmount(endTime, secondMonthTotalAmount);
         var middleMonthsAmount = GetMiddleMonthsAmount(startTime, endTime, budgets);
 
         return firstMonthAmount + middleMonthsAmount + lastMonthAmount;
