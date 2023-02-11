@@ -130,19 +130,19 @@ public class BudgetTests
     }
 
 
-    // [Test]
-    // public void query_two_day_in_cross_month_with_budget()
-    // {
-    //     GivenGetAllReturn(new List<Budget>
-    //     {
-    //         CreateBudget("202303", 31000),
-    //         CreateBudget("202304", 15000)
-    //     });
-    //
-    //     var budget = QueryBudget(new DateTime(2023, 3, 31), new DateTime(2023, 4, 1));
-    //
-    //     BudgetShouldBe(budget, 1500);
-    // }
+    [Test]
+    public void query_two_day_in_cross_month_with_budget()
+    {
+        GivenGetAllReturn(new List<Budget>
+        {
+            CreateBudget("202303", 31000),
+            CreateBudget("202304", 15000)
+        });
+    
+        var budget = QueryBudget(new DateTime(2023, 3, 31), new DateTime(2023, 4, 1));
+    
+        BudgetShouldBe(budget, 1500);
+    }
 
     private static void BudgetShouldBe(decimal budget, int expected)
     {
