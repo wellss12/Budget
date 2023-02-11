@@ -111,22 +111,6 @@ public class BudgetService
         return budgets.FirstOrDefault(t => t.YearMonth == time.ToString("yyyyMM"));
     }
 
-    private decimal GetBudgetInMonth(DateTime startTime1, DateTime endTime1, Budget budget)
-    {
-        if (IsFullMonth(startTime1, endTime1))
-        {
-            return budget.Amount;
-        }
-
-        var days = (endTime1 - startTime1).Days;
-        days++;
-
-        var _ = DateTime.TryParse(budget.YearMonth, out var dateTime);
-        var daysInMonth = DateTime.DaysInMonth(dateTime.Year, dateTime.Month);
-
-        return budget.Amount / daysInMonth * days;
-    }
-
     private static bool IsFullMonth(DateTime startTime, DateTime endTime)
     {
         return startTime == new DateTime(startTime.Year, startTime.Month, 1)
