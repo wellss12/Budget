@@ -144,6 +144,21 @@ public class BudgetTests
         BudgetShouldBe(budget, 1500);
     }
 
+    [Test]
+    public void query_two_day_in_cross_three_month_with_budget()
+    {
+        GivenGetAllReturn(new List<Budget>
+        {
+            CreateBudget("202303", 31000),
+            CreateBudget("202304", 30000),
+            CreateBudget("202305", 31000)
+        });
+
+        var budget = QueryBudget(new DateTime(2023, 3, 31), new DateTime(2023, 5, 5));
+
+        BudgetShouldBe(budget, 1000 + 30000 + 5000);
+    }
+
     private static void BudgetShouldBe(decimal budget, int expected)
     {
         budget.Should().Be(expected);
