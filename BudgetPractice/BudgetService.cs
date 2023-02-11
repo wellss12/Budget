@@ -43,12 +43,28 @@ public class BudgetService
         }
         else
         {
-            var startTimeDaysInMonth = DateTime.DaysInMonth(startTime.Year, startTime.Month);
-            var endTimeDaysInMonth = DateTime.DaysInMonth(endTime.Year, endTime.Month);
-            var firstMonthAmount = startBudget.Amount / startTimeDaysInMonth * (startTimeDaysInMonth - startTime.Day + 1);
-            var lastMonthAmount = (endBudget.Amount / endTimeDaysInMonth) * (endTime.Day);
+            var startTimeDaysInMonth = GetDaysInMonth(startTime);
+            var endTimeDaysInMonth = GetDaysInMonth(endTime);
+            
+            var amountForOneDayInFirstMonth = GetAmountForOneDay(startBudget.Amount, startTimeDaysInMonth);
+            var amountForOneDayInLastMonth = GetAmountForOneDay(endBudget.Amount, endTimeDaysInMonth);
+
+            var firstMonthTotalDays = startTimeDaysInMonth - startTime.Day + 1;
+            var firstMonthAmount = amountForOneDayInFirstMonth * firstMonthTotalDays;
+            var lastMonthAmount = amountForOneDayInLastMonth * endTime.Day;
+            
             return firstMonthAmount + lastMonthAmount;
         }
+    }
+
+    private static int GetAmountForOneDay(int amount, int daysInMonth)
+    {
+        return amount / daysInMonth;
+    }
+
+    private static int GetDaysInMonth(DateTime time)
+    {
+        return DateTime.DaysInMonth(time.Year, time.Month);
     }
 
     private static bool IsSameMonth(DateTime startTime, DateTime endTime)
