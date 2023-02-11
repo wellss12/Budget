@@ -20,6 +20,7 @@ public class BudgetTests
         _budgetService = new BudgetService(_budgetRepo);
     }
 
+
     [Test]
     public void query_one_day_in_single_month_with_budget()
     {
@@ -42,6 +43,19 @@ public class BudgetTests
         });
 
         WhenQueryBudget(new DateTime(2023, 3, 1), new DateTime(2023, 3, 5));
+
+        ThenBudgetAmountShouldBe(5000);
+    }
+
+    [Test]
+    public void date_time_try_parse_has_bug()
+    {
+        GivenGetAllReturn(new List<Budget>
+        {
+            CreateBudget("202304", 30000)
+        });
+
+        WhenQueryBudget(new DateTime(2023, 4, 1), new DateTime(2023, 4, 5));
 
         ThenBudgetAmountShouldBe(5000);
     }
