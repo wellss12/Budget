@@ -52,8 +52,17 @@ public class BudgetService
             var firstMonthTotalDays = startTimeDaysInMonth - startTime.Day + 1;
             var firstMonthAmount = amountForOneDayInFirstMonth * firstMonthTotalDays;
             var lastMonthAmount = amountForOneDayInLastMonth * endTime.Day;
+
+            var nextMonth = new DateTime(startTime.Year, startTime.AddMonths(1).Month, 1);
+            var middleAmount = 0;
+            while (nextMonth < new DateTime(endTime.Year, endTime.Month, 1))
+            {
+                var currentBudget = budgets.First(budget => budget.YearMonth == nextMonth.ToString("yyyyMM"));
+                middleAmount += currentBudget.Amount;
+                nextMonth = nextMonth.AddMonths(1);
+            }
             
-            return firstMonthAmount + lastMonthAmount;
+            return firstMonthAmount + lastMonthAmount + middleAmount;
         }
     }
 
