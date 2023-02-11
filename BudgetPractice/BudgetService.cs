@@ -43,7 +43,11 @@ public class BudgetService
         }
         else
         {
-            return startBudget.Amount + endBudget.Amount;
+            var startTimeDaysInMonth = DateTime.DaysInMonth(startTime.Year, startTime.Month);
+            var endTimeDaysInMonth = DateTime.DaysInMonth(endTime.Year, endTime.Month);
+            var firstMonthAmount = startBudget.Amount / startTimeDaysInMonth * (startTimeDaysInMonth - startTime.Day + 1);
+            var lastMonthAmount = (endBudget.Amount / endTimeDaysInMonth) * (endTime.Day);
+            return firstMonthAmount + lastMonthAmount;
         }
     }
 
