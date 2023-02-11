@@ -29,22 +29,18 @@ public class BudgetService
             {
                 return startBudget.Amount;
             }
-            else
-            {
-                return GetAmountForSameMonthRange(startTime, endTime, startBudget);
-            }
+
+            return GetAmountForSameMonthRange(startTime, endTime, startBudget);
         }
-        else
-        {
-            return GetAmountForDifferentMonthRange(startTime, endTime, budgets);
-        }
+
+        return GetAmountForDifferentMonthRange(startTime, endTime, budgets);
     }
 
     private static decimal GetAmountForDifferentMonthRange(DateTime startTime, DateTime endTime, List<Budget> budgets)
     {
         var firstMonthTotalAmount = GetBudget(startTime, budgets)?.Amount ?? 0;
         var secondMonthTotalAmount = GetBudget(endTime, budgets)?.Amount ?? 0;
-        
+
         var firstMonthAmount = GetFirstMonthAmount(startTime, firstMonthTotalAmount);
         var lastMonthAmount = GetLastMonthAmount(endTime, secondMonthTotalAmount);
         var middleMonthsAmount = GetMiddleMonthsAmount(startTime, endTime, budgets);
@@ -57,7 +53,7 @@ public class BudgetService
         var days = (endTime - startTime).Days;
         days++;
 
-        var _ = DateTime.TryParse(startBudget.YearMonth, out var dateTime);
+        var _ = DateOnly.TryParseExact(startBudget.YearMonth, "yyyyMM", out var dateTime);
         var daysInMonth = DateTime.DaysInMonth(dateTime.Year, dateTime.Month);
 
         return startBudget.Amount / daysInMonth * days;
