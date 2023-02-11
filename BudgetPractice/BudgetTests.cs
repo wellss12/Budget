@@ -73,11 +73,16 @@ public class BudgetTests
     [Test]
     public void query_with_not_exist_budget()
     {
-        _budgetRepo.GetAll().Returns(new List<Budget>());
+        GivenGetAllReturnEmpty();
 
         var budget = QueryBudget(new DateTime(2023, 3, 1), new DateTime(2023, 3, 2));
 
         BudgetShouldBe(budget, 0);
+    }
+
+    private void GivenGetAllReturnEmpty()
+    {
+        _budgetRepo.GetAll().Returns(new List<Budget>());
     }
 
 
