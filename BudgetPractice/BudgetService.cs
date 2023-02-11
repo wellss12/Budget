@@ -25,6 +25,13 @@ public class DateTimeRange
         return _startTime == new DateTime(_startTime.Year, _startTime.Month, 1)
                && _endTime == new DateTime(_endTime.Year, _endTime.Month, 1).AddMonths(1).AddDays(-1);
     }
+
+    public int GetTotalDays()
+    {
+        var days = (_endTime - _startTime).Days;
+        days++;
+        return days;
+    }
 }
 
 public class BudgetService
@@ -54,7 +61,7 @@ public class BudgetService
                 return startBudget.Amount;
             }
 
-            return GetAmountForSameMonth(startTime, endTime, startBudget);
+            return GetAmountForSameMonth(startBudget);
         }
 
         return GetAmountForDifferentMonth(startTime, endTime, budgets);
@@ -72,11 +79,9 @@ public class BudgetService
         return firstMonthAmount + middleMonthsAmount + lastMonthAmount;
     }
 
-    private static decimal GetAmountForSameMonth(DateTime startTime, DateTime endTime, Budget? startBudget)
+    private decimal GetAmountForSameMonth(Budget? startBudget)
     {
-        var days = (endTime - startTime).Days;
-        days++;
-
+        var days = _dateTimeRange.GetTotalDays();
         var _ = DateOnly.TryParseExact(startBudget.YearMonth, "yyyyMM", out var dateTime);
         var daysInMonth = DateTime.DaysInMonth(dateTime.Year, dateTime.Month);
 
