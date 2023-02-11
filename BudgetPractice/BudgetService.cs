@@ -4,9 +4,27 @@ using System.Linq;
 
 namespace BudgetPractice;
 
+public class DateTimeRange
+{
+    private readonly DateTime _endTime;
+    private readonly DateTime _startTime;
+
+    public DateTimeRange(DateTime startTime, DateTime endTime)
+    {
+        _startTime = startTime;
+        _endTime = endTime;
+    }
+
+    public bool IsSameMonth()
+    {
+        return _startTime.ToString("yyyyMM") == _endTime.ToString("yyyyMM");
+    }
+}
+
 public class BudgetService
 {
     private readonly IBudgetRepo _budgetRepo;
+    private DateTimeRange _dateTimeRange;
 
     public BudgetService(IBudgetRepo budgetRepo)
     {
@@ -22,8 +40,8 @@ public class BudgetService
         }
 
         var startBudget = GetBudget(startTime, budgets);
-
-        if (IsSameMonth(startTime, endTime))
+        _dateTimeRange = new DateTimeRange(startTime, endTime);
+        if (_dateTimeRange.IsSameMonth())
         {
             if (IsFullMonth(startTime, endTime))
             {
@@ -97,17 +115,12 @@ public class BudgetService
         return DateTime.DaysInMonth(time.Year, time.Month);
     }
 
-    private static bool IsSameMonth(DateTime startTime, DateTime endTime)
-    {
-        return startTime.ToString("yyyyMM") == endTime.ToString("yyyyMM");
-    }
-
     private static Budget? GetBudget(DateTime time, IEnumerable<Budget> budgets)
     {
         return budgets.FirstOrDefault(t => t.YearMonth == time.ToString("yyyyMM"));
     }
 
-    private static bool IsFullMonth(DateTime startTime, DateTime endTime)
+    private bool IsFullMonth(DateTime startTime, DateTime endTime)
     {
         return startTime == new DateTime(startTime.Year, startTime.Month, 1)
                && endTime == new DateTime(endTime.Year, endTime.Month, 1).AddMonths(1).AddDays(-1);
