@@ -6,34 +6,34 @@ namespace BudgetPractice;
 
 public class DateTimeRange
 {
-    private readonly DateTime _endTime;
-    private readonly DateTime _startTime;
+    public DateTime EndTime { get; }
+    public DateTime StartTime { get; }
 
     public DateTimeRange(DateTime startTime, DateTime endTime)
     {
-        _startTime = startTime;
-        _endTime = endTime;
+        StartTime = startTime;
+        EndTime = endTime;
     }
+
 
     public bool IsSameMonth()
     {
-        return _startTime.ToString("yyyyMM") == _endTime.ToString("yyyyMM");
+        return StartTime.ToString("yyyyMM") == EndTime.ToString("yyyyMM");
     }
 
     public bool IsFullMonth()
     {
-        return _startTime == new DateTime(_startTime.Year, _startTime.Month, 1)
-               && _endTime == new DateTime(_endTime.Year, _endTime.Month, 1).AddMonths(1).AddDays(-1);
+        return StartTime == new DateTime(StartTime.Year, StartTime.Month, 1)
+               && EndTime == new DateTime(EndTime.Year, EndTime.Month, 1).AddMonths(1).AddDays(-1);
     }
 
     public int GetTotalDays()
     {
-        var days = (_endTime - _startTime).Days;
+        var days = (EndTime - StartTime).Days;
         days++;
         return days;
     }
 }
-
 public class BudgetService
 {
     private readonly IBudgetRepo _budgetRepo;
@@ -64,17 +64,17 @@ public class BudgetService
             return GetAmountForSameMonth(startBudget);
         }
 
-        return GetAmountForDifferentMonth(startTime, endTime, budgets);
+        return GetAmountForDifferentMonth(budgets);
     }
 
-    private static decimal GetAmountForDifferentMonth(DateTime startTime, DateTime endTime, List<Budget> budgets)
+    private decimal GetAmountForDifferentMonth(List<Budget> budgets)
     {
-        var firstMonthTotalAmount = GetBudget(startTime, budgets)?.Amount ?? 0;
-        var secondMonthTotalAmount = GetBudget(endTime, budgets)?.Amount ?? 0;
+        var firstMonthTotalAmount = GetBudget(_dateTimeRange.StartTime, budgets)?.Amount ?? 0;
+        var secondMonthTotalAmount = GetBudget(_dateTimeRange.EndTime, budgets)?.Amount ?? 0;
 
-        var firstMonthAmount = GetFirstMonthAmount(startTime, firstMonthTotalAmount);
-        var lastMonthAmount = GetLastMonthAmount(endTime, secondMonthTotalAmount);
-        var middleMonthsAmount = GetMiddleMonthsAmount(startTime, endTime, budgets);
+        var firstMonthAmount = GetFirstMonthAmount(_dateTimeRange.StartTime, firstMonthTotalAmount);
+        var lastMonthAmount = GetLastMonthAmount(_dateTimeRange.EndTime, secondMonthTotalAmount);
+        var middleMonthsAmount = GetMiddleMonthsAmount(_dateTimeRange.StartTime, _dateTimeRange.EndTime, budgets);
 
         return firstMonthAmount + middleMonthsAmount + lastMonthAmount;
     }
