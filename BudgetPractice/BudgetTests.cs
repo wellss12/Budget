@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using FluentAssertions;
 using NSubstitute;
+using NSubstitute.ReturnsExtensions;
 using NUnit.Framework;
 
 namespace BudgetPractice;
@@ -71,13 +72,28 @@ public class BudgetTests
     }
 
     [Test]
-    public void query_with_not_exist_budget()
+    public void query_with_empty_budget()
     {
         GivenGetAllReturnEmpty();
 
         var budget = QueryBudget(new DateTime(2023, 3, 1), new DateTime(2023, 3, 2));
 
         BudgetShouldBe(budget, 0);
+    }
+
+    [Test]
+    public void query_with_null_budget()
+    {
+        GivenGetAllReturnNull();
+
+        var budget = QueryBudget(new DateTime(2023, 3, 1), new DateTime(2023, 3, 2));
+
+        BudgetShouldBe(budget, 0);
+    }
+
+    private void GivenGetAllReturnNull()
+    {
+        _budgetRepo.GetAll().ReturnsNull();
     }
 
     private void GivenGetAllReturnEmpty()
