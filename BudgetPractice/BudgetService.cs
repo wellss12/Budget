@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace BudgetPractice;
@@ -20,15 +21,40 @@ public class BudgetService
             return 0;
         }
 
-        var startBudget = budgets.FirstOrDefault(t => t.YearMonth == startTime.ToString("yyyyMM"));
-        var endBudget = budgets.FirstOrDefault(t => t.YearMonth == endTime.ToString("yyyyMM"));
+        var startBudget = GetBudget(startTime, budgets);
+        var endBudget = GetBudget(endTime, budgets);
 
-        if (startTime.ToString("yyyyMM") == endTime.ToString("yyyyMM"))
+        if (IsSameMonth(startTime, endTime))
         {
-            return GetBudgetInMonth(startTime, endTime, startBudget);
-        }
+            if (IsFullMonth(startTime, endTime))
+            {
+                return startBudget.Amount;
+            }
+            else
+            {
+                var days = (endTime - startTime).Days;
+                days++;
 
-        return startBudget.Amount + endBudget.Amount;
+                var _ = DateTime.TryParse(startBudget.YearMonth, out var dateTime);
+                var daysInMonth = DateTime.DaysInMonth(dateTime.Year, dateTime.Month);
+
+                return startBudget.Amount / daysInMonth * days;
+            }
+        }
+        else
+        {
+            return startBudget.Amount + endBudget.Amount;
+        }
+    }
+
+    private static bool IsSameMonth(DateTime startTime, DateTime endTime)
+    {
+        return startTime.ToString("yyyyMM") == endTime.ToString("yyyyMM");
+    }
+
+    private static Budget? GetBudget(DateTime time, IEnumerable<Budget> budgets)
+    {
+        return budgets.FirstOrDefault(t => t.YearMonth == time.ToString("yyyyMM"));
     }
 
     private decimal GetBudgetInMonth(DateTime startTime1, DateTime endTime1, Budget budget)
