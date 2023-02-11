@@ -30,13 +30,13 @@ public class BudgetService
                 return startBudget.Amount;
             }
 
-            return GetAmountForSameMonthRange(startTime, endTime, startBudget);
+            return GetAmountForSameMonth(startTime, endTime, startBudget);
         }
 
-        return GetAmountForDifferentMonthRange(startTime, endTime, budgets);
+        return GetAmountForDifferentMonth(startTime, endTime, budgets);
     }
 
-    private static decimal GetAmountForDifferentMonthRange(DateTime startTime, DateTime endTime, List<Budget> budgets)
+    private static decimal GetAmountForDifferentMonth(DateTime startTime, DateTime endTime, List<Budget> budgets)
     {
         var firstMonthTotalAmount = GetBudget(startTime, budgets)?.Amount ?? 0;
         var secondMonthTotalAmount = GetBudget(endTime, budgets)?.Amount ?? 0;
@@ -48,7 +48,7 @@ public class BudgetService
         return firstMonthAmount + middleMonthsAmount + lastMonthAmount;
     }
 
-    private static decimal GetAmountForSameMonthRange(DateTime startTime, DateTime endTime, Budget? startBudget)
+    private static decimal GetAmountForSameMonth(DateTime startTime, DateTime endTime, Budget? startBudget)
     {
         var days = (endTime - startTime).Days;
         days++;
