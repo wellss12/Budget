@@ -11,6 +11,7 @@ public class BudgetTests
 {
     private IBudgetRepo _budgetRepo;
     private BudgetService _budgetService;
+    private decimal _budgetAmount;
 
     [SetUp]
     public void SetUp()
@@ -27,9 +28,9 @@ public class BudgetTests
             CreateBudget("202303", 31000)
         });
 
-        var budget = QueryBudget(new DateTime(2023, 3, 1), new DateTime(2023, 3, 1));
+        WhenQueryBudget(new DateTime(2023, 3, 1), new DateTime(2023, 3, 1));
 
-        BudgetShouldBe(budget, 1000);
+        ThenBudgetAmountShouldBe(1000);
     }
 
     [Test]
@@ -40,9 +41,9 @@ public class BudgetTests
             CreateBudget("202303", 31000)
         });
 
-        var budget = QueryBudget(new DateTime(2023, 3, 1), new DateTime(2023, 3, 2));
+        WhenQueryBudget(new DateTime(2023, 3, 1), new DateTime(2023, 3, 2));
 
-        BudgetShouldBe(budget, 2000);
+        ThenBudgetAmountShouldBe(2000);
     }
 
     [Test]
@@ -53,9 +54,9 @@ public class BudgetTests
             CreateBudget("202303", 31000)
         });
 
-        var budget = QueryBudget(new DateTime(2023, 3, 30), new DateTime(2023, 3, 31));
+        WhenQueryBudget(new DateTime(2023, 3, 30), new DateTime(2023, 3, 31));
 
-        BudgetShouldBe(budget, 2000);
+        ThenBudgetAmountShouldBe(2000);
     }
 
     [Test]
@@ -66,9 +67,9 @@ public class BudgetTests
             CreateBudget("202303", 0)
         });
 
-        var budget = QueryBudget(new DateTime(2023, 3, 1), new DateTime(2023, 3, 2));
+        WhenQueryBudget(new DateTime(2023, 3, 1), new DateTime(2023, 3, 2));
 
-        BudgetShouldBe(budget, 0);
+        ThenBudgetAmountShouldBe(0);
     }
 
     [Test]
@@ -76,9 +77,9 @@ public class BudgetTests
     {
         GivenGetAllReturnEmpty();
 
-        var budget = QueryBudget(new DateTime(2023, 3, 1), new DateTime(2023, 3, 2));
+        WhenQueryBudget(new DateTime(2023, 3, 1), new DateTime(2023, 3, 2));
 
-        BudgetShouldBe(budget, 0);
+        ThenBudgetAmountShouldBe(0);
     }
 
     [Test]
@@ -86,9 +87,9 @@ public class BudgetTests
     {
         GivenGetAllReturnNull();
 
-        var budget = QueryBudget(new DateTime(2023, 3, 1), new DateTime(2023, 3, 2));
+        WhenQueryBudget(new DateTime(2023, 3, 1), new DateTime(2023, 3, 2));
 
-        BudgetShouldBe(budget, 0);
+        ThenBudgetAmountShouldBe(0);
     }
 
     private void GivenGetAllReturnNull()
@@ -110,9 +111,9 @@ public class BudgetTests
             CreateBudget("202303", 31000)
         });
 
-        var budget = QueryBudget(new DateTime(2023, 3, 1), new DateTime(2023, 3, 31));
+        WhenQueryBudget(new DateTime(2023, 3, 1), new DateTime(2023, 3, 31));
 
-        BudgetShouldBe(budget, 31000);
+        ThenBudgetAmountShouldBe(31000);
     }
 
     [Test]
@@ -124,9 +125,9 @@ public class BudgetTests
             CreateBudget("202304", 3000)
         });
 
-        var budget = QueryBudget(new DateTime(2023, 3, 1), new DateTime(2023, 4, 30));
+        WhenQueryBudget(new DateTime(2023, 3, 1), new DateTime(2023, 4, 30));
 
-        BudgetShouldBe(budget, 34000);
+        ThenBudgetAmountShouldBe(34000);
     }
 
 
@@ -139,9 +140,9 @@ public class BudgetTests
             CreateBudget("202304", 15000)
         });
 
-        var budget = QueryBudget(new DateTime(2023, 3, 31), new DateTime(2023, 4, 1));
+        WhenQueryBudget(new DateTime(2023, 3, 31), new DateTime(2023, 4, 1));
 
-        BudgetShouldBe(budget, 1500);
+        ThenBudgetAmountShouldBe(1500);
     }
 
     [Test]
@@ -154,19 +155,19 @@ public class BudgetTests
             CreateBudget("202305", 31000)
         });
 
-        var budget = QueryBudget(new DateTime(2023, 3, 31), new DateTime(2023, 5, 5));
+        WhenQueryBudget(new DateTime(2023, 3, 31), new DateTime(2023, 5, 5));
 
-        BudgetShouldBe(budget, 1000 + 30000 + 5000);
+        ThenBudgetAmountShouldBe(1000 + 30000 + 5000);
     }
 
-    private static void BudgetShouldBe(decimal budget, int expected)
+    private void ThenBudgetAmountShouldBe(int expected)
     {
-        budget.Should().Be(expected);
+        _budgetAmount.Should().Be(expected);
     }
 
-    private decimal QueryBudget(DateTime startTime, DateTime endTime)
+    private void WhenQueryBudget(DateTime startTime, DateTime endTime)
     {
-        return _budgetService.Query(startTime, endTime);
+        _budgetAmount = _budgetService.Query(startTime, endTime);
     }
 
 
