@@ -4,7 +4,7 @@ namespace BudgetPractice;
 
 public class BudgetRepo : IBudgetRepo
 {
-    public List<Budget> GetAll()
+    public List<Budget?> GetAll()
     {
         return default;
     }

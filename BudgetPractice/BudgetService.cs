@@ -15,8 +15,13 @@ public class BudgetService
     public decimal Query(DateTime startTime, DateTime endTime)
     {
         var budgets = _budgetRepo.GetAll();
-        var startBudget = budgets.First(t => t.YearMonth == startTime.ToString("yyyyMM"));
-        var endBudget = budgets.First(t => t.YearMonth == endTime.ToString("yyyyMM"));
+        if (!budgets.Any())
+        {
+            return 0;
+        }
+
+        var startBudget = budgets.FirstOrDefault(t => t.YearMonth == startTime.ToString("yyyyMM"));
+        var endBudget = budgets.FirstOrDefault(t => t.YearMonth == endTime.ToString("yyyyMM"));
 
         if (startTime.ToString("yyyyMM") == endTime.ToString("yyyyMM"))
         {
