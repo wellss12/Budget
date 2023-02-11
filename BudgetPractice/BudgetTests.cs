@@ -9,9 +9,9 @@ namespace BudgetPractice;
 
 public class BudgetTests
 {
+    private decimal _budgetAmount;
     private IBudgetRepo _budgetRepo;
     private BudgetService _budgetService;
-    private decimal _budgetAmount;
 
     [SetUp]
     public void SetUp()
@@ -34,40 +34,27 @@ public class BudgetTests
     }
 
     [Test]
-    public void query_two_day_in_single_month_with_budget_in_month_start()
+    public void query_multi_day_in_single_month_with_budget()
     {
         GivenGetAllReturn(new List<Budget>
         {
             CreateBudget("202303", 31000)
         });
 
-        WhenQueryBudget(new DateTime(2023, 3, 1), new DateTime(2023, 3, 2));
+        WhenQueryBudget(new DateTime(2023, 3, 1), new DateTime(2023, 3, 5));
 
-        ThenBudgetAmountShouldBe(2000);
+        ThenBudgetAmountShouldBe(5000);
     }
 
     [Test]
-    public void query_two_day_in_single_month_in_month_end()
-    {
-        GivenGetAllReturn(new List<Budget>
-        {
-            CreateBudget("202303", 31000)
-        });
-
-        WhenQueryBudget(new DateTime(2023, 3, 30), new DateTime(2023, 3, 31));
-
-        ThenBudgetAmountShouldBe(2000);
-    }
-
-    [Test]
-    public void query_two_day_in_single_month_with_zero_budget()
+    public void query_multi_day_in_single_month_with_zero_budget()
     {
         GivenGetAllReturn(new List<Budget>
         {
             CreateBudget("202303", 0)
         });
 
-        WhenQueryBudget(new DateTime(2023, 3, 1), new DateTime(2023, 3, 2));
+        WhenQueryBudget(new DateTime(2023, 3, 1), new DateTime(2023, 3, 5));
 
         ThenBudgetAmountShouldBe(0);
     }
@@ -91,17 +78,6 @@ public class BudgetTests
 
         ThenBudgetAmountShouldBe(0);
     }
-
-    private void GivenGetAllReturnNull()
-    {
-        _budgetRepo.GetAll().ReturnsNull();
-    }
-
-    private void GivenGetAllReturnEmpty()
-    {
-        _budgetRepo.GetAll().Returns(new List<Budget>());
-    }
-
 
     [Test]
     public void query_full_month()
@@ -132,7 +108,7 @@ public class BudgetTests
 
 
     [Test]
-    public void query_two_day_in_cross_two_month_with_budget()
+    public void query_cross_two_month_with_budget()
     {
         GivenGetAllReturn(new List<Budget>
         {
@@ -140,13 +116,13 @@ public class BudgetTests
             CreateBudget("202304", 15000)
         });
 
-        WhenQueryBudget(new DateTime(2023, 3, 31), new DateTime(2023, 4, 1));
+        WhenQueryBudget(new DateTime(2023, 3, 31), new DateTime(2023, 4, 2));
 
-        ThenBudgetAmountShouldBe(1500);
+        ThenBudgetAmountShouldBe(2000);
     }
 
     [Test]
-    public void query_two_day_in_cross_three_month_with_budget()
+    public void query_cross_three_month_with_budget()
     {
         GivenGetAllReturn(new List<Budget>
         {
@@ -158,6 +134,16 @@ public class BudgetTests
         WhenQueryBudget(new DateTime(2023, 3, 31), new DateTime(2023, 5, 5));
 
         ThenBudgetAmountShouldBe(1000 + 30000 + 5000);
+    }
+
+    private void GivenGetAllReturnNull()
+    {
+        _budgetRepo.GetAll().ReturnsNull();
+    }
+
+    private void GivenGetAllReturnEmpty()
+    {
+        _budgetRepo.GetAll().Returns(new List<Budget>());
     }
 
     private void ThenBudgetAmountShouldBe(int expected)
