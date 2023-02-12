@@ -22,8 +22,8 @@ public class BudgetService
             return 0;
         }
 
-        var startBudget = GetBudget(startTime, budgets);
         _dateTimeRange = new DateTimeRange(startTime, endTime);
+        var startBudget = GetBudget(_dateTimeRange.StartTime, budgets);
         if (_dateTimeRange.IsSameMonth())
         {
             if (_dateTimeRange.IsFullMonth())
@@ -31,38 +31,38 @@ public class BudgetService
                 return startBudget.Amount;
             }
 
-            return GetAmountForSameMonth(startBudget);
+            return GetAmountForSingleMonth(startBudget);
         }
 
-        return GetAmountForDifferentMonth(budgets);
+        return GetAmountForMultiMonth(budgets);
     }
 
-    private decimal GetAmountForDifferentMonth(List<Budget> budgets)
+    private decimal GetAmountForMultiMonth(List<Budget> budgets)
     {
         var firstMonthTotalAmount = GetBudget(_dateTimeRange.StartTime, budgets)?.Amount ?? 0;
         var secondMonthTotalAmount = GetBudget(_dateTimeRange.EndTime, budgets)?.Amount ?? 0;
 
-        var firstMonthAmount = GetFirstMonthAmount(_dateTimeRange.StartTime, firstMonthTotalAmount);
-        var lastMonthAmount = GetLastMonthAmount(_dateTimeRange.EndTime, secondMonthTotalAmount);
-        var middleMonthsAmount = GetMiddleMonthsAmount(_dateTimeRange.StartTime, _dateTimeRange.EndTime, budgets);
+        var firstMonthAmount = GetFirstMonthAmount(firstMonthTotalAmount);
+        var lastMonthAmount = GetLastMonthAmount(secondMonthTotalAmount);
+        var middleMonthsAmount = GetMiddleMonthsAmount(budgets);
 
         return firstMonthAmount + middleMonthsAmount + lastMonthAmount;
     }
 
-    private decimal GetAmountForSameMonth(Budget? startBudget)
+    private decimal GetAmountForSingleMonth(Budget? budget)
     {
         var days = _dateTimeRange.GetTotalDays();
-        var _ = DateOnly.TryParseExact(startBudget.YearMonth, "yyyyMM", out var dateTime);
+        var _ = DateOnly.TryParseExact(budget.YearMonth, "yyyyMM", out var dateTime);
         var daysInMonth = DateTime.DaysInMonth(dateTime.Year, dateTime.Month);
 
-        return startBudget.Amount / daysInMonth * days;
+        return budget.Amount / daysInMonth * days;
     }
 
-    private static int GetMiddleMonthsAmount(DateTime startTime, DateTime endTime, List<Budget> budgets)
+    private int GetMiddleMonthsAmount(List<Budget> budgets)
     {
-        var nextMonth = new DateTime(startTime.Year, startTime.AddMonths(1).Month, 1);
+        var nextMonth = new DateTime(_dateTimeRange.StartTime.Year, _dateTimeRange.StartTime.AddMonths(1).Month, 1);
         var middleAmount = 0;
-        while (nextMonth < new DateTime(endTime.Year, endTime.Month, 1))
+        while (nextMonth < new DateTime(_dateTimeRange.EndTime.Year, _dateTimeRange.EndTime.Month, 1))
         {
             var currentBudget = budgets.First(budget => budget.YearMonth == nextMonth.ToString("yyyyMM"));
             middleAmount += currentBudget.Amount;
@@ -72,18 +72,18 @@ public class BudgetService
         return middleAmount;
     }
 
-    private static int GetLastMonthAmount(DateTime endTime, int totalAmount)
+    private int GetLastMonthAmount(int totalAmount)
     {
-        var endTimeDaysInMonth = GetDaysInMonth(endTime);
+        var endTimeDaysInMonth = GetDaysInMonth(_dateTimeRange.EndTime);
         var amountForOneDayInLastMonth = GetAmountForOneDay(totalAmount, endTimeDaysInMonth);
-        return amountForOneDayInLastMonth * endTime.Day;
+        return amountForOneDayInLastMonth * _dateTimeRange.EndTime.Day;
     }
 
-    private static int GetFirstMonthAmount(DateTime startTime, int totalAmount)
+    private int GetFirstMonthAmount(int totalAmount)
     {
-        var startTimeDaysInMonth = GetDaysInMonth(startTime);
+        var startTimeDaysInMonth = GetDaysInMonth(_dateTimeRange.StartTime);
         var amountForOneDayInFirstMonth = GetAmountForOneDay(totalAmount, startTimeDaysInMonth);
-        return amountForOneDayInFirstMonth * (startTimeDaysInMonth - startTime.Day + 1);
+        return amountForOneDayInFirstMonth * (startTimeDaysInMonth - _dateTimeRange.StartTime.Day + 1);
     }
 
     private static int GetAmountForOneDay(int amount, int daysInMonth)
